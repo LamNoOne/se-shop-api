@@ -52,10 +52,12 @@ const signIn = asyncHandling(async (req, res) => {
   res.cookie('accessToken', result.accessToken, {
     httpOnly: true,
     secure: true,
+    sameSite:'Strict',
     maxAge: cookieATMaxAge
   }).cookie('refreshToken', result.refreshToken, {
     httpOnly: true,
     secure: true,
+    sameSite:'Strict',
     maxAge: cookieRTMaxAge
   })
 
