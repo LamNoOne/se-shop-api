@@ -19,8 +19,6 @@ const corsOptions = {
     return callback(new ApiError(StatusCodes.FORBIDDEN, `${origin} not allowed by our CORS Policy`))
   },
   optionsSuccessStatus: 200,
-  methods: 'GET,PUT,POST,DELETE,UPDATE,OPTIONS',
-  allowedHeaders: 'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept',
   credentials: true
 }
 
