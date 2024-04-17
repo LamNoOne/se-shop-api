@@ -5,14 +5,14 @@ const cookieParser = require('cookie-parser')
 const cors = require('cors')
 const { default: helmet } = require('helmet')
 const compression = require('compression')
-const morgan = require('morgan')
+// const morgan = require('morgan')
 const { corsOptions } = require('./config/cors.config')
 const { mysql } = require('./databases')
 const redirectApiVersion = require('./core/redirect.api.version')
 const errorHandlingMiddleware = require('./core/error.handling')
 const notFoundMiddleware = require('~/core/not.found.handling')
-const { nodeEnv } = require('~/config/environment.config')
-const { NODE_ENV_DEV } = require('~/config/constants.config')
+// const { nodeEnv } = require('~/config/environment.config')
+// const { NODE_ENV_DEV } = require('~/config/constants.config')
 
 const app = express()
 
@@ -22,9 +22,9 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(helmet())
 app.use(compression())
-if (nodeEnv === NODE_ENV_DEV) {
-  app.use(morgan('dev'))
-}
+// if (nodeEnv === NODE_ENV_DEV) {
+//   app.use(morgan('dev'))
+// }
 
 mysql.getInstance()
 

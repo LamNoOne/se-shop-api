@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: SE_SHOP
+-- Host: 127.0.0.1    Database: bqyn4i9idwwizvoyerer
 -- ------------------------------------------------------
 -- Server version	5.7.44
 
