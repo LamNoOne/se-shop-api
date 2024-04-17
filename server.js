@@ -6,10 +6,18 @@ const app = require('./src/app')
 
 const { port } = environmentConfig.app
 
-const server = app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`Server is running at: ${port}`)
-})
+let server = null
+if (environmentConfig.nodeEnv === 'production') {
+  server = app.listen(process.env.PORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server is running at: ${process.env.PORT}`)
+  })
+} else {
+  server = app.listen(port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Server is running at: ${port}`)
+  })
+}
 
 exitHook(() => {
   server.close()
