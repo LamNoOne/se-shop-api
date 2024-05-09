@@ -28,7 +28,8 @@ app.use(compression())
 
 mysql.getInstance()
 
-app.use('/api', redirectApiVersion)
+app.use('/api/v1', redirectApiVersion)
+app.use('/api/v2', redirectApiVersion)
 app.use('/', notFoundMiddleware)
 app.use(errorHandlingMiddleware)
 
