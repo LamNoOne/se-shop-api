@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken")
 const {
     app: { accessTokenExpires, refreshTokenExpires, resetTokenExpires },
 } = require("~/config/environment.config")
-const ApiError = require("../../../../build/src/core/api.error")
+const ApiError = require("~/core/api.error")
 const { StatusCodes, ReasonPhrases } = require("http-status-codes")
 
 const createKeyPairRsa = () => {
