@@ -1,28 +1,36 @@
-'use strict'
+"use strict"
 
-const express = require('express')
+const express = require("express")
 const {
-  validateCreateUserStatus,
-  validateUpdateUserStatusById,
-  validateDeleteUserStatusByIds
-} = require('~/api/v2/validations/user.status.validation')
+    validateCreateUserStatus,
+    validateUpdateUserStatusById,
+    validateDeleteUserStatusByIds,
+} = require("~/api/v2/validations/user.status.validation")
 const {
-  createUserStatus,
-  getAllUserStatuses,
-  getUserStatusById,
-  updateUserStatusById,
-  deleteUserStatusById,
-  deleteGenderByIds
-}= require('~/api/v2/controllers/user.status.controller')
-const queryStringMiddleware = require('~/api/v2/middlewares/query.string.middleware')
+    createUserStatus,
+    getAllUserStatuses,
+    getUserStatusById,
+    updateUserStatusById,
+    deleteUserStatusById,
+    deleteGenderByIds,
+} = require("~/api/v2/controllers/user.status.controller")
+const queryStringMiddleware = require("~/api/v2/middlewares/query.string.middleware")
 
 const router = express.Router()
 
-router.get('/', queryStringMiddleware, getAllUserStatuses)
-router.get('/get-user-status', getUserStatusById)
-router.post('/create', validateCreateUserStatus, createUserStatus)
-router.patch('/update-user-status', validateUpdateUserStatusById, updateUserStatusById)
-router.delete('/delete-user-status', deleteUserStatusById)
-router.delete('/delete-user-statuses', validateDeleteUserStatusByIds, deleteGenderByIds)
+router.get("/", queryStringMiddleware, getAllUserStatuses)
+router.get("/get-user-status", getUserStatusById)
+router.post("/create", validateCreateUserStatus, createUserStatus)
+router.patch(
+    "/update-user-status",
+    validateUpdateUserStatusById,
+    updateUserStatusById
+)
+router.delete("/delete-user-status", deleteUserStatusById)
+router.delete(
+    "/delete-user-statuses",
+    validateDeleteUserStatusByIds,
+    deleteGenderByIds
+)
 
 module.exports = router

@@ -62,5 +62,5 @@ module.exports = {
     createTokenPair,
     verifyToken,
     createResetToken,
-    getToken
+    getToken,
 }

@@ -1,43 +1,43 @@
-'use strict'
+"use strict"
 
-const { mysql } = require('./environment.config')
+const { mysql } = require("./environment.config")
 
 module.exports = {
-  development: {
-    username: mysql.username,
-    password: mysql.password,
-    database: mysql.databaseName,
-    host: mysql.host,
-    port: mysql.port,
-    dialect: 'mysql',
-    dialectOptions: {
-      charset: 'utf8',
-      collate: 'utf8_general_ci'
+    development: {
+        username: mysql.username,
+        password: mysql.password,
+        database: mysql.databaseName,
+        host: mysql.host,
+        port: mysql.port,
+        dialect: "mysql",
+        dialectOptions: {
+            charset: "utf8",
+            collate: "utf8_general_ci",
+        },
+        logging: false,
     },
-    logging: false
-  },
-  test: {
-    username: mysql.username,
-    password: mysql.password,
-    database: mysql.databaseName,
-    host: mysql.host,
-    port: mysql.port,
-    dialect: 'mysql',
-    dialectOptions: {
-      bigNumberStrings: true
+    test: {
+        username: mysql.username,
+        password: mysql.password,
+        database: mysql.databaseName,
+        host: mysql.host,
+        port: mysql.port,
+        dialect: "mysql",
+        dialectOptions: {
+            bigNumberStrings: true,
+        },
+        logging: false,
     },
-    logging: false
-  },
-  production: {
-    username: mysql.username,
-    password: mysql.password,
-    database: mysql.databaseName,
-    host: mysql.host,
-    port: mysql.port,
-    dialect: 'mysql',
-    dialectOptions: {
-      bigNumberStrings: true
+    production: {
+        username: mysql.username,
+        password: mysql.password,
+        database: mysql.databaseName,
+        host: mysql.host,
+        port: mysql.port,
+        dialect: "mysql",
+        dialectOptions: {
+            bigNumberStrings: true,
+        },
+        logging: false,
     },
-    logging: false
-  }
 }
