@@ -1,0 +1,1 @@
+export const QUERY_EXCEPTION = ["page", "limit", "sortBy", "order"]

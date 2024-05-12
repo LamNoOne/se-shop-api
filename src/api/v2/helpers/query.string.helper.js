@@ -1,23 +1,22 @@
 "use strict"
 
 const { getDataInfo, convertToQueryLikeObject } = require("~/api/v2/utils")
+const { QUERY_EXCEPTION } = require("../utils/constants")
 
 const getFilterKeysFromQueryObject = (queryObject = {}) => {
     const keys = Object.keys(queryObject)
-    return keys.filter((key) => key[0] !== "_")
+    return keys.filter((key) => !QUERY_EXCEPTION.includes(key))
 }
 
 const createFilter = (queryObject = {}) => {
     const filterKeys = getFilterKeysFromQueryObject(queryObject)
     const filterObject = getDataInfo(queryObject, filterKeys)
-
     convertToQueryLikeObject(filterObject)
-
     return filterObject
 }
 
 const createPagination = (queryObject = {}) => {
-    const { _page, _limit } = queryObject
+    const { page: _page, limit: _limit } = queryObject
     const skip = (Number(_page) - 1) * Number(_limit)
     return {
         skip: skip || null,
@@ -31,7 +30,7 @@ const createSorter = (queryObject = {}) => {
         desc: "desc",
     }
 
-    let { _sortBy, _order } = queryObject
+    let { sortBy: _sortBy, order: _order } = queryObject
 
     const isValidOrder = orders[_order] ? true : false
     if (!isValidOrder) _order = orders.asc
