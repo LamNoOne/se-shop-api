@@ -44,7 +44,7 @@ const updateQuantityProduct = asyncHandling(async (req, res) => {
 
     new SuccessResponse({
         statusCode: StatusCodes.CREATED,
-        message: "Increase quantity of product successfully",
+        message: "Update quantity of product successfully",
         metadata: { cart },
     }).send(res)
 })
@@ -52,10 +52,9 @@ const updateQuantityProduct = asyncHandling(async (req, res) => {
 const deleteProductFromCart = asyncHandling(async (req, res) => {
     const userId = req?.user?.id || null
 
-    const { cartId, productId } = req.query
+    const { productId } = req.query
 
     const cart = await cartService.deleteProductFromCart({
-        cartId,
         userId,
         productId,
     })
@@ -70,10 +69,9 @@ const deleteProductFromCart = asyncHandling(async (req, res) => {
 const deleteProductsFromCart = asyncHandling(async (req, res) => {
     const userId = req?.user?.id || null
 
-    const { cartId, productIds } = req.body
+    const { productIds } = req.body
 
     const cart = await cartService.deleteProductsFromCart({
-        cartId,
         userId,
         productIds,
     })
