@@ -5,7 +5,7 @@ const { QUERY_EXCEPTION } = require("../utils/constants")
 
 const getFilterKeysFromQueryObject = (queryObject = {}) => {
     const keys = Object.keys(queryObject)
-    return keys.filter((key) => !QUERY_EXCEPTION.includes(key))
+    return keys.filter((key) => !QUERY_EXCEPTION.includes(key) && queryObject[key])
 }
 
 const createFilter = (queryObject = {}) => {
