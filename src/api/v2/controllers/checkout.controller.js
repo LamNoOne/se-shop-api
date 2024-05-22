@@ -52,7 +52,7 @@ const orderFromCart = asyncHandling(async (req, res) => {
 
     new SuccessResponse({
         message: "Order successfully",
-        metadata: { ...result },
+        metadata: { order: result },
     }).send(res)
 })
 

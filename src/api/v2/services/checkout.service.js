@@ -14,6 +14,7 @@ const {
     OrderDetail,
     Product,
     PaymentForm,
+    User,
 } = require("~/api/v2/models")
 const vnpayProvider = require("~/api/v2/providers/vnpay.provider")
 // const { app: { paySuccessUrl, payFailUrl } } = require('~/config/environment.config')
@@ -281,12 +282,17 @@ const getOrder = async ({ userId, orderId }) => {
             {
                 model: PaymentForm,
                 as: "paymentForm",
-                attributes: ["id", "name"],
+                attributes: ["name"],
             },
             {
                 model: OrderStatus,
                 as: "orderStatus",
-                attributes: ["id", "name"],
+                attributes: ["name"],
+            },
+            {
+                model: User,
+                as: "user",
+                attributes: ["lastName", "firstName"],
             },
             {
                 model: OrderDetail,
@@ -306,7 +312,42 @@ const getOrder = async ({ userId, orderId }) => {
     })
     if (!fullOrder)
         throw new ApiError(StatusCodes.BAD_REQUEST, "Order not found")
-    return fullOrder
+
+    // Calculate total amount for each order product
+    fullOrder.products.forEach((product) => {
+        product.totalAmount = product.quantity * product.price
+    })
+
+    // Calculate total amount for the entire order
+    const totalAmount = fullOrder.products.reduce((total, product) => {
+        return total + product.totalAmount
+    }, 0)
+
+    // Map the products to the desired format
+    const orderProducts = fullOrder.products.map((product) => ({
+        quantity: product.quantity,
+        product: {
+            id: product.product.id,
+            name: product.product.name,
+            description: product.product.description,
+            imageUrl: product.product.imageUrl,
+            price: product.price,
+        },
+        totalAmount: product.totalAmount,
+    }))
+
+    // Construct the final formatted object
+    const formattedOrder = {
+        orderId: fullOrder.id,
+        name: `${fullOrder.user.lastName} ${fullOrder.user.firstName}`,
+        shipAddress: fullOrder.shipAddress,
+        phoneNumber: fullOrder.phoneNumber,
+        orderStatus: fullOrder.orderStatus.name,
+        orderProducts: orderProducts,
+        totalAmount: totalAmount,
+    }
+
+    return formattedOrder
 }
 
 const createPaymentUrl = async ({ userId, ipAddr, bankCode, orderId }) => {
