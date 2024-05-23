@@ -24,27 +24,21 @@ const checkProductsAvailable = async (orderProducts = []) => {
 
 const checkOrderProductsWithCart = async (
     cartId,
-    userId,
     orderProducts = []
 ) => {
     return await Promise.all(
-        orderProducts.map(async (orderProduct) => {
+        orderProducts.map(async (productId) => {
             const foundCartDetail =
                 await cartDetailRepo.getCartByCartIdProductId({
-                    productId: orderProduct.productId,
+                    productId,
                     cartId,
                 })
             if (!foundCartDetail) {
                 return null
             }
 
-            const isMathQuantity =
-                orderProduct.quantity === foundCartDetail.quantity
-
-            if (!isMathQuantity) return null
-
             return {
-                quantity: orderProduct.quantity,
+                quantity: foundCartDetail.quantity,
                 productId: foundCartDetail.productId,
             }
         })

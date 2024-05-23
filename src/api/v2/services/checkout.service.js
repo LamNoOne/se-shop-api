@@ -128,27 +128,22 @@ const order = async ({
 }
 
 const orderFromCart = async ({
-    cartId,
     userId,
     shipAddress,
     phoneNumber,
     paymentFormId,
     orderProducts = [],
 }) => {
-    const foundCart = cartRepo.getCartByCartIdUserId({ cartId, userId })
+    const foundCart = await cartRepo.getCartByUserId({ userId })
+    const cartId = foundCart.id
+    console.log("CARTID::::",  cartId)
     if (!foundCart) throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
 
-    const [checkedOrderProductsWithCart, checkedProducts] = await Promise.all([
-        checkoutRepo.checkOrderProductsWithCart(cartId, userId, orderProducts),
-        checkoutRepo.checkProductsAvailable(orderProducts),
-    ])
+    const setOfOrderProduct = await checkoutRepo.checkOrderProductsWithCart(cartId, orderProducts)
+    if(setOfOrderProduct.includes(null)) throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
 
-    if (
-        checkedOrderProductsWithCart.includes(null) ||
-        checkedProducts.includes(null)
-    ) {
-        throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
-    }
+    const checkedProducts = await checkoutRepo.checkProductsAvailable(setOfOrderProduct)
+    if (checkedProducts.includes(null)) throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
 
     try {
         const newOrder = await orderRepo.createOrder({
@@ -160,7 +155,7 @@ const orderFromCart = async ({
         })
 
         const newOrderProducts = await Promise.all(
-            orderProducts.map(async (orderProduct) => {
+            setOfOrderProduct.map(async (orderProduct) => {
                 // to get product price in db
                 const foundProduct = await productRepo.getProductById(
                     orderProduct.productId
@@ -195,7 +190,7 @@ const orderFromCart = async ({
         )
 
         // delete ordered products in cart
-        const deleteProductFromCartPromises = orderProducts.map(
+        const deleteProductFromCartPromises = setOfOrderProduct.map(
             async (orderProduct) => {
                 return cartService.deleteProductFromCart({
                     cartId,

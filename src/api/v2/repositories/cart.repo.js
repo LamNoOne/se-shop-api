@@ -67,9 +67,9 @@ const deleteCartByUserId = async (userId) => {
     await foundCart.destroy({ force: true })
 }
 
-const getCartByCartIdUserId = async ({ cartId = "", userId = "" }) => {
+const getCartByUserId = async ({ userId = "" }) => {
     return await Cart.findOne({
-        where: { id: cartId, userId },
+        where: { userId: userId },
     })
 }
 
@@ -77,5 +77,5 @@ module.exports = {
     getFullCartByProductIds,
     getFullCart,
     deleteCartByUserId,
-    getCartByCartIdUserId,
+    getCartByUserId,
 }

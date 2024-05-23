@@ -38,11 +38,10 @@ const order = asyncHandling(async (req, res) => {
 
 const orderFromCart = asyncHandling(async (req, res) => {
     const userId = req?.user?.id || null
-    const { shipAddress, phoneNumber, paymentFormId, cartId, orderProducts } =
+    const { shipAddress, phoneNumber, paymentFormId, orderProducts } =
         req.body
 
     const result = await checkoutService.orderFromCart({
-        cartId,
         userId,
         shipAddress,
         phoneNumber,
