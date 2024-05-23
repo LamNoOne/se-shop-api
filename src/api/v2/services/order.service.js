@@ -14,12 +14,48 @@ const orderRepo = require("~/api/v2/repositories/order.repo")
 const orderDetailRepo = require("~/api/v2/repositories/order.detail.repo")
 
 const getAllOrders = async ({ filter, selector, pagination, sorter }) => {
-    return await orderRepo.getAllOrders({
+    const setOfAllOrders = await orderRepo.getAllOrders({
         filter,
         selector,
         pagination,
         sorter,
     })
+
+    const formattedAllOrders = setOfAllOrders.map((orderItem) => {
+        // Calculate total amount for each order product
+    orderItem.products.forEach((product) => {
+        product.totalAmount = product.quantity * product.price
+    })
+
+    // Calculate total amount for the entire order
+    const totalAmount = orderItem.products.reduce((total, product) => {
+        return total + product.totalAmount
+    }, 0)
+
+    // Map the products to the desired format
+    const orderProducts = orderItem.products.map((product) => ({
+        quantity: product.quantity,
+        product: {
+            id: product.product.id,
+            name: product.product.name,
+            description: product.product.description,
+            imageUrl: product.product.imageUrl,
+            price: product.price,
+        },
+        totalAmount: product.totalAmount,
+    }))
+
+    // Construct the final formatted object
+    return {
+        orderId: orderItem.id,
+        shipAddress: orderItem.shipAddress,
+        phoneNumber: orderItem.phoneNumber,
+        orderStatus: orderItem.orderStatus.name,
+        orderProducts: orderProducts,
+        totalAmount: totalAmount }
+    })
+
+    return formattedAllOrders
 }
 
 const getOrder = async (orderId) => {
