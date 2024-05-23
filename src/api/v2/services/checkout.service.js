@@ -136,7 +136,6 @@ const orderFromCart = async ({
 }) => {
     const foundCart = await cartRepo.getCartByUserId({ userId })
     const cartId = foundCart.id
-    console.log("CARTID::::",  cartId)
     if (!foundCart) throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
 
     const setOfOrderProduct = await checkoutRepo.checkOrderProductsWithCart(cartId, orderProducts)
