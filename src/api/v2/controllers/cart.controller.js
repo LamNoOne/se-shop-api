@@ -5,6 +5,21 @@ const cartService = require("~/api/v2/services/cart.service")
 const SuccessResponse = require("~/core/success.response")
 const asyncHandling = require("~/core/async.handling")
 
+const getSelectedProductsCart = asyncHandling(async (req, res) => {
+    const userId = req?.user?.id || null
+    const { productIds } = req.body
+
+    const cart = await cartService.getSelectedProductsCart({
+        userId,
+        productIds,
+    })
+
+    new SuccessResponse({
+        message: "Get selected products in cart successfully",
+        metadata: { cart },
+    }).send(res)
+})
+
 const getFullCartForCustomer = asyncHandling(async (req, res) => {
     const id = req?.user?.id || null
     const { filter, selector, pagination, sorter } = req
@@ -89,4 +104,5 @@ module.exports = {
     updateQuantityProduct,
     deleteProductFromCart,
     deleteProductsFromCart,
+    getSelectedProductsCart
 }

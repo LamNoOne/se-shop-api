@@ -11,6 +11,45 @@ const {
 const ApiError = require("~/core/api.error")
 const { StatusCodes, ReasonPhrases } = require("http-status-codes")
 
+const getSelectedProductsCart = async ({ userId, productIds }) => {
+    // productIds is an array of product id
+    const foundCart = await getCart({ userId })
+    if (!foundCart) throw new ApiError(StatusCodes.NOT_FOUND, "Cart not found")
+    const cartId = foundCart.id
+
+    let selectedProducts = await Promise.all(
+        productIds.map(async (productId) => {
+            const foundProduct = await getProductById(productId)
+            if (!foundProduct)
+                throw new ApiError(StatusCodes.NOT_FOUND, "Product not found")
+
+            const foundCartDetail = await getCartByCartIdProductId({
+                cartId,
+                productId,
+            })
+            if (!foundCartDetail) return null
+
+            return {
+                quantity: foundCartDetail.quantity,
+                product: {
+                    id: foundProduct.id,
+                    name: foundProduct.name,
+                    description: foundProduct.description,
+                    imageUrl: foundProduct.imageUrl,
+                    price: foundProduct.price,
+                },
+            }
+        })
+    )
+    selectedProducts = selectedProducts.filter((product) => product !== null)
+    
+    return {
+        id: foundCart.id,
+        total: selectedProducts.length,
+        products: selectedProducts,
+    }
+}
+
 const createCart = async ({ userId }) => {
     try {
         return await Cart.create({ userId })
@@ -172,11 +211,7 @@ const addProductToCart = async ({ userId, productId, quantity }) => {
     }
 }
 
-const updateQuantityProduct = async ({
-    userId,
-    productId,
-    quantity,
-}) => {
+const updateQuantityProduct = async ({ userId, productId, quantity }) => {
     if (quantity < 0)
         throw new ApiError(StatusCodes.BAD_REQUEST, ReasonPhrases.BAD_REQUEST)
 
@@ -264,4 +299,5 @@ module.exports = {
     updateQuantityProduct,
     deleteProductFromCart,
     deleteProductsFromCart,
+    getSelectedProductsCart,
 }

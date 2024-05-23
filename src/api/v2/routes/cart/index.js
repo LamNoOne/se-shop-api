@@ -7,12 +7,14 @@ const {
     updateQuantityProduct,
     deleteProductFromCart,
     deleteProductsFromCart,
+    getSelectedProductsCart,
 } = require("~/api/v2/controllers/cart.controller")
 const queryStringMiddleware = require("~/api/v2/middlewares/query.string.middleware")
 
 const router = express.Router()
 
 router.get("/get-my-cart", queryStringMiddleware, getFullCartForCustomer)
+router.get("/get-selected-products", queryStringMiddleware, getSelectedProductsCart)
 router.post("/add-to-cart", addProductToCart)
 router.patch("/update-quantity-product", updateQuantityProduct)
 router.delete("/delete-product-from-cart", deleteProductFromCart)
