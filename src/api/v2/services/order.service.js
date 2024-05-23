@@ -14,6 +14,7 @@ const orderRepo = require("~/api/v2/repositories/order.repo")
 const orderDetailRepo = require("~/api/v2/repositories/order.detail.repo")
 
 const getAllOrders = async ({ filter, selector, pagination, sorter }) => {
+
     const setOfAllOrders = await orderRepo.getAllOrders({
         filter,
         selector,

@@ -296,7 +296,7 @@ const forgotPassword = async ({ email }) => {
   `
 
     return await sendMail({
-        from: "SE Shop <doananhkiet0506@gmail.com>",
+        from: "SE Ecommerce",
         email,
         subject: "Reset password",
         html,

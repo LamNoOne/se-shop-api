@@ -38,8 +38,7 @@ const order = asyncHandling(async (req, res) => {
 
 const orderFromCart = asyncHandling(async (req, res) => {
     const userId = req?.user?.id || null
-    const { shipAddress, phoneNumber, paymentFormId, orderProducts } =
-        req.body
+    const { shipAddress, phoneNumber, paymentFormId, orderProducts } = req.body
 
     const result = await checkoutService.orderFromCart({
         userId,
@@ -59,16 +58,31 @@ const getAllOrders = asyncHandling(async (req, res) => {
     const userId = req?.user?.id || null
     const { filter, selector, pagination, sorter } = req
 
-    const orders = await checkoutService.getAllOrder(userId, {
+    const allOrdersPromise = checkoutService.getAllOrder(userId, { filter })
+    const ordersPromise = checkoutService.getAllOrder(userId, {
         filter,
         selector,
         pagination,
         sorter,
     })
 
+    const [allOrders, orders] = await Promise.all([
+        allOrdersPromise,
+        ordersPromise,
+    ])
+
+    const total = allOrders.length
+    const limit = pagination?.limit
+    const totalPage = limit <= total ? Math.ceil(total / limit) : 1
+
     new SuccessResponse({
         message: "Get all orders successfully",
-        metadata: { orders },
+        metadata: {
+            page: pagination.skip / pagination.limit + 1,
+            total,
+            totalPage,
+            orders,
+        },
     }).send(res)
 })
 

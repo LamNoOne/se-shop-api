@@ -138,11 +138,18 @@ const orderFromCart = async ({
     const cartId = foundCart.id
     if (!foundCart) throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
 
-    const setOfOrderProduct = await checkoutRepo.checkOrderProductsWithCart(cartId, orderProducts)
-    if(setOfOrderProduct.includes(null)) throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
+    const setOfOrderProduct = await checkoutRepo.checkOrderProductsWithCart(
+        cartId,
+        orderProducts
+    )
+    if (setOfOrderProduct.includes(null))
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
 
-    const checkedProducts = await checkoutRepo.checkProductsAvailable(setOfOrderProduct)
-    if (checkedProducts.includes(null)) throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
+    const checkedProducts = await checkoutRepo.checkProductsAvailable(
+        setOfOrderProduct
+    )
+    if (checkedProducts.includes(null))
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Order failed")
 
     try {
         const newOrder = await orderRepo.createOrder({
@@ -227,12 +234,50 @@ const getAllOrder = async (
     userId,
     { filter, selector, pagination, sorter }
 ) => {
-    return await orderRepo.getAllOrdersForCustomer(userId, {
+    const setOfAllOrders = await orderRepo.getAllOrdersForCustomer(userId, {
         filter,
         selector,
         pagination,
         sorter,
     })
+
+    const allOrders = setOfAllOrders.map((orderItem) => {
+        // Calculate total amount for each order product
+        orderItem.products.forEach((product) => {
+            product.totalAmount = product.quantity * product.price
+        })
+
+        // Calculate total amount for the entire order
+        const totalAmount = orderItem.products.reduce((total, product) => {
+            return total + product.totalAmount
+        }, 0)
+
+        // Map the products to the desired format
+        const orderProducts = orderItem.products.map((product) => ({
+            quantity: product.quantity,
+            product: {
+                id: product.product.id,
+                name: product.product.name,
+                description: product.product.description,
+                imageUrl: product.product.imageUrl,
+                price: product.price,
+            },
+            totalAmount: product.totalAmount,
+        }))
+
+        // Construct the final formatted object
+        const formattedOrder = {
+            orderId: orderItem.id,
+            name: `${orderItem.user.lastName} ${orderItem.user.firstName}`,
+            shipAddress: orderItem.shipAddress,
+            phoneNumber: orderItem.phoneNumber,
+            orderStatus: orderItem.orderStatus.name,
+            orderProducts: orderProducts,
+            totalAmount: totalAmount,
+        }
+        return formattedOrder
+    })
+    return allOrders
 }
 
 const cancelOrder = async ({ userId, orderId }) => {

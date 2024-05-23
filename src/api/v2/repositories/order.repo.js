@@ -33,7 +33,7 @@ const createOrder = async ({
 // eslint-disable-next-line no-unused-vars
 const getAllOrders = async ({ filter, selector, pagination, sorter }) => {
     return await Order.findAll({
-        where: filter?.userId ? { userId: filter.userId } : null,
+        where: filter,
         attributes: {
             exclude: ["orderStatusId", "paymentFormId", "userId"],
         },
@@ -84,8 +84,16 @@ const getAllOrdersForCustomer = async (
     { filter, selector, pagination, sorter }
 ) => {
     if (!userId) return null
+
+    let newFilter = { ...filter }
+
+    if(filter?.name) {
+        const { name, ...restFilter } = filter
+        newFilter = restFilter
+    }
+    
     return await Order.findAll({
-        where: { userId },
+        where: filter?.name ? { userId, ...newFilter } : { userId, ...filter },
         attributes: {
             exclude: ["orderStatusId", "paymentFormId", "userId"],
         },
@@ -93,18 +101,18 @@ const getAllOrdersForCustomer = async (
             {
                 model: User,
                 as: "user",
-                attributes: ["id", "firstName", "lastName"],
+                attributes: ["firstName", "lastName"],
             },
             {
                 model: OrderStatus,
                 as: "orderStatus",
-                attributes: ["id", "name"],
+                attributes: ["name"],
                 // where: filter?.orderStatusName ? { name: filter.orderStatusName } : null
             },
             {
                 model: PaymentForm,
                 as: "paymentForm",
-                attributes: ["id", "name"],
+                attributes: ["name"],
                 where: filter?.paymentFormName
                     ? { name: filter.paymentFormName }
                     : null,
@@ -120,6 +128,7 @@ const getAllOrdersForCustomer = async (
                         model: Product,
                         as: "product",
                         attributes: ["id", "name", "description", "imageUrl"],
+                        where: filter?.name ? { name: filter.name } : null,
                     },
                 ],
             },
