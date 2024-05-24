@@ -14,7 +14,7 @@ const queryStringMiddleware = require("~/api/v2/middlewares/query.string.middlew
 const router = express.Router()
 
 router.get("/get-my-cart", queryStringMiddleware, getFullCartForCustomer)
-router.get("/get-selected-products", queryStringMiddleware, getSelectedProductsCart)
+router.post("/get-selected-products", queryStringMiddleware, getSelectedProductsCart)
 router.post("/add-to-cart", addProductToCart)
 router.patch("/update-quantity-product", updateQuantityProduct)
 router.delete("/delete-product-from-cart", deleteProductFromCart)
