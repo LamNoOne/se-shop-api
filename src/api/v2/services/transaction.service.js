@@ -1,5 +1,5 @@
 "use strict"
-const crypto = require("crypto")
+const { v4: uuidv4 } = require("uuid");
 const { StatusCodes, ReasonPhrases } = require("http-status-codes")
 const ApiError = require("~/core/api.error")
 const { getOrder } = require("~/api/v2/services/checkout.service")
@@ -34,7 +34,7 @@ const createTransaction = async ({ userId, orderId, nonce }) => {
     const { success, transaction, message } = await gateway.transaction.sale({
         amount: totalAmount,
         paymentMethodNonce: nonce,
-        orderId: crypto.randomUUID(),
+        orderId: uuidv4(),
         options: {
             submitForSettlement: true,
         },
