@@ -6,7 +6,6 @@ const gateway = require("~/config/braintree.config")
 
 const getTransaction = asyncHandling(async (req, res) => {
     const { transactionId } = req.query
-    console.log("transactionId", transactionId)
     const order = await orderService.getOrderByTransaction(transactionId)
 
     const stream = gateway.transaction.search(

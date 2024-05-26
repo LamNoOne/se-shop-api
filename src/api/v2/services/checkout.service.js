@@ -269,8 +269,11 @@ const getAllOrder = async (
         const formattedOrder = {
             orderId: orderItem.id,
             name: `${orderItem.user.lastName} ${orderItem.user.firstName}`,
-            shipAddress: orderItem.shipAddress,
+            firstName: orderItem.user.firstName,
+            lastName: orderItem.user.lastName,
+            email: orderItem.user.email,
             phoneNumber: orderItem.phoneNumber,
+            shipAddress: orderItem.shipAddress,
             orderStatus: orderItem.orderStatus.name,
             orderProducts: orderProducts,
             totalAmount: totalAmount,
@@ -350,7 +353,6 @@ const getOrder = async ({ userId, orderId }) => {
         ],
     })
 
-    console.log(fullOrder.dataValues)
     if (!fullOrder)
         throw new ApiError(StatusCodes.BAD_REQUEST, "Order not found")
 

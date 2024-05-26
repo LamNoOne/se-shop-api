@@ -8,7 +8,6 @@ const { Order } = require("~/api/v1/models")
 
 const createTransaction = async ({ userId, orderId, nonce }) => {
     const orderCheckout = await getOrder({ userId, orderId })
-    console.log("ORDER::::", orderCheckout)
     if (!orderCheckout) {
         throw new ApiError({
             status: StatusCodes.NOT_FOUND,

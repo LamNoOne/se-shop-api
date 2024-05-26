@@ -101,7 +101,7 @@ const getAllOrdersForCustomer = async (
             {
                 model: User,
                 as: "user",
-                attributes: ["firstName", "lastName"],
+                attributes: ["firstName", "lastName", "email"],
             },
             {
                 model: OrderStatus,
