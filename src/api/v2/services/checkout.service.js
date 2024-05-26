@@ -331,7 +331,7 @@ const getOrder = async ({ userId, orderId }) => {
             {
                 model: User,
                 as: "user",
-                attributes: ["lastName", "firstName"],
+                attributes: ["lastName", "firstName", "email"],
             },
             {
                 model: OrderDetail,
@@ -349,6 +349,8 @@ const getOrder = async ({ userId, orderId }) => {
             },
         ],
     })
+
+    console.log(fullOrder.dataValues)
     if (!fullOrder)
         throw new ApiError(StatusCodes.BAD_REQUEST, "Order not found")
 
@@ -379,8 +381,11 @@ const getOrder = async ({ userId, orderId }) => {
     const formattedOrder = {
         orderId: fullOrder.id,
         name: `${fullOrder.user.lastName} ${fullOrder.user.firstName}`,
-        shipAddress: fullOrder.shipAddress,
+        firstName: fullOrder.user.firstName,
+        lastName: fullOrder.user.lastName,
+        email: fullOrder.user.email,
         phoneNumber: fullOrder.phoneNumber,
+        shipAddress: fullOrder.shipAddress,
         orderStatus: fullOrder.orderStatus.name,
         orderProducts: orderProducts,
         totalAmount: totalAmount,

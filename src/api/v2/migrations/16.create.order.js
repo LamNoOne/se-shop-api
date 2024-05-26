@@ -36,6 +36,10 @@ module.exports = {
                         key: "id",
                     },
                 },
+                transactionId: {
+                    type: Sequelize.STRING(50),
+                    allowNull: true,
+                },
                 shipAddress: {
                     type: Sequelize.STRING(100),
                     allowNull: true,

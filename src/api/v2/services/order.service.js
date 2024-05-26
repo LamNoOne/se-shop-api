@@ -133,6 +133,93 @@ const getOrder = async (orderId) => {
     // Construct the final formatted object
     const formattedOrder = {
         orderId: foundOrder.id,
+        transactionId: foundOrder.transactionId,
+        name: `${foundOrder.user.lastName} ${foundOrder.user.firstName}`,
+        shipAddress: foundOrder.shipAddress,
+        phoneNumber: foundOrder.phoneNumber,
+        orderStatus: foundOrder.orderStatus.name,
+        orderProducts: orderProducts,
+        totalAmount: totalAmount,
+    }
+
+    return formattedOrder
+}
+
+const getOrderByTransaction = async (transactionId) => {
+    const bannedFieldsOfOrderDetails = [
+        "orderId",
+        "productId",
+        "createdAt",
+        "updatedAt",
+    ]
+
+    const foundOrder = await Order.findOne({
+        where: { transactionId: transactionId },
+        attributes: {
+            exclude: ["orderStatusId", "paymentFormId", "userId"],
+        },
+        include: [
+            {
+                model: OrderStatus,
+                as: "orderStatus",
+                attributes: ["name"],
+            },
+            {
+                model: PaymentForm,
+                as: "paymentForm",
+                attributes: ["name"],
+            },
+            {
+                model: User,
+                as: "user",
+                attributes: ["lastName", "firstName"],
+            },
+            {
+                model: OrderDetail,
+                as: "products",
+                attributes: {
+                    exclude: bannedFieldsOfOrderDetails,
+                },
+                include: [
+                    {
+                        model: Product,
+                        as: "product",
+                        attributes: ["id", "name", "imageUrl", "description"],
+                    },
+                ],
+            },
+        ],
+    })
+    if (!foundOrder)
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Order not found")
+
+    // Calculate total amount for each order product
+    foundOrder.products.forEach((product) => {
+        product.totalAmount = product.quantity * product.price
+    })
+
+    // Calculate total amount for the entire order
+    const totalAmount = foundOrder.products.reduce((total, product) => {
+        return total + product.totalAmount
+    }, 0)
+
+    // Map the products to the desired format
+    const orderProducts = foundOrder.products.map((product) => ({
+        quantity: product.quantity,
+        product: {
+            id: product.product.id,
+            name: product.product.name,
+            description: product.product.description,
+            imageUrl: product.product.imageUrl,
+            price: product.price,
+        },
+        totalAmount: product.totalAmount,
+    }))
+
+    // Construct the final formatted object
+    const formattedOrder = {
+        orderId: foundOrder.id,
+        transactionId: foundOrder.transactionId,
         name: `${foundOrder.user.lastName} ${foundOrder.user.firstName}`,
         shipAddress: foundOrder.shipAddress,
         phoneNumber: foundOrder.phoneNumber,
@@ -167,6 +254,7 @@ const deleteOrder = async (id) => {
 module.exports = {
     getAllOrders,
     getOrder,
+    getOrderByTransaction,
     updateOrder,
     deleteOrder,
 }

@@ -16,6 +16,7 @@ const paymentFormRouter = require("./payment.form")
 const orderStatusRouter = require("./order.status")
 const orderRouter = require("./order")
 const wishlistRouter = require("./wishlist")
+const transactionRouter = require("./transaction")
 const {
     authenticate,
     authorize,
@@ -41,5 +42,6 @@ router.use("/payment-forms", paymentFormRouter)
 router.use("/order-statuses", orderStatusRouter)
 router.use("/orders", orderRouter)
 router.use("/wishlist", wishlistRouter)
+router.use("/transaction", transactionRouter)
 
 module.exports = router

@@ -15,6 +15,9 @@ Order.init({
   userId: {
     type: DataTypes.INTEGER.UNSIGNED
   },
+  transactionId: {
+    type: DataTypes.STRING
+  },
   shipAddress: {
     type: DataTypes.STRING
   },
