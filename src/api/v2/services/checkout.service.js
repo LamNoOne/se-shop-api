@@ -268,6 +268,7 @@ const getAllOrder = async (
         // Construct the final formatted object
         const formattedOrder = {
             orderId: orderItem.id,
+            transactionId: orderItem.transactionId,
             name: `${orderItem.user.lastName} ${orderItem.user.firstName}`,
             firstName: orderItem.user.firstName,
             lastName: orderItem.user.lastName,
@@ -382,6 +383,7 @@ const getOrder = async ({ userId, orderId }) => {
     // Construct the final formatted object
     const formattedOrder = {
         orderId: fullOrder.id,
+        transactionId: fullOrder.transactionId,
         name: `${fullOrder.user.lastName} ${fullOrder.user.firstName}`,
         firstName: fullOrder.user.firstName,
         lastName: fullOrder.user.lastName,
