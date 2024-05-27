@@ -124,7 +124,16 @@ const getUserById = async (id) => {
         },
     })
     if (!user) throw new ApiError(StatusCodes.NOT_FOUND, "User not found")
-    return user
+    return {
+        id: user.id,
+        lastName: user.lastName,
+        firstName: user.firstName,
+        username: user.username,
+        image: user.imageUrl,
+        phoneNumber: user.phoneNumber,
+        email: user.email,
+        address: user.address
+    }
 }
 
 const getUserByUsername = async ({ username }) => {
