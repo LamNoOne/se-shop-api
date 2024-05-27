@@ -151,7 +151,7 @@ const getUserByEmail = async ({ email }) => {
 }
 
 const updateUserById = async (id, payload = {}) => {
-    const user = await getUserById(id)
+    const user = await userRepo.getUserById(id)
     if (!user) throw new ApiError(StatusCodes.BAD_REQUEST, "User not found")
 
     // cannot change this fields

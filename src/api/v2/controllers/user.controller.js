@@ -88,7 +88,16 @@ const updateUserItseft = asyncHandling(async (req, res) => {
 
     new SuccessResponse({
         message: "Update user successfully",
-        metadata: { user },
+        metadata: { 
+            id: user.id,
+            lastName: user.lastName,
+            firstName: user.firstName,
+            username: user.username,
+            image: user.imageUrl,
+            phoneNumber: user.phoneNumber,
+            email: user.email,
+            address: user.address,
+         },
     }).send(res)
 })
 
