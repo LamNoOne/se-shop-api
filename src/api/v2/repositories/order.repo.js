@@ -87,13 +87,13 @@ const getAllOrdersForCustomer = async (
 
     let newFilter = { ...filter }
 
-    if(filter?.name) {
-        const { name, ...restFilter } = filter
+    if(filter?.name || filter?.orderStatusName) {
+        const { name, orderStatusName, ...restFilter } = filter
         newFilter = restFilter
     }
     
     return await Order.findAll({
-        where: filter?.name ? { userId, ...newFilter } : { userId, ...filter },
+        where: (filter?.name || filter?.orderStatusName) ? { userId, ...newFilter } : { userId, ...filter },
         attributes: {
             exclude: ["orderStatusId", "paymentFormId", "userId"],
         },
@@ -107,7 +107,7 @@ const getAllOrdersForCustomer = async (
                 model: OrderStatus,
                 as: "orderStatus",
                 attributes: ["name"],
-                // where: filter?.orderStatusName ? { name: filter.orderStatusName } : null
+                where: filter?.orderStatusName ? { name: filter.orderStatusName } : null
             },
             {
                 model: PaymentForm,
