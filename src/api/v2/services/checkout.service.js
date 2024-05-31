@@ -283,7 +283,7 @@ const getAllOrder = async (
         }
         return formattedOrder
     })
-    return allOrders
+    return allOrders.filter((orderItem) => Array.from(orderItem.orderProducts).length > 0)
 }
 
 const cancelOrder = async ({ userId, orderId }) => {
