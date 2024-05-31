@@ -278,6 +278,8 @@ const getAllOrder = async (
             orderStatus: orderItem.orderStatus.name,
             orderProducts: orderProducts,
             totalAmount: totalAmount,
+            createdAt: orderItem.createdAt,
+            updatedAt: orderItem.updatedAt,
         }
         return formattedOrder
     })
