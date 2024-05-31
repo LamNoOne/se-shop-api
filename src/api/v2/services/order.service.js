@@ -226,6 +226,8 @@ const getOrderByTransaction = async (transactionId) => {
         orderStatus: foundOrder.orderStatus.name,
         orderProducts: orderProducts,
         totalAmount: totalAmount,
+        createdAt: foundOrder.createdAt,
+        updatedAt: foundOrder.updatedAt,
     }
 
     return formattedOrder

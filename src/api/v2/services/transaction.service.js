@@ -4,7 +4,8 @@ const { StatusCodes, ReasonPhrases } = require("http-status-codes")
 const ApiError = require("~/core/api.error")
 const { getOrder } = require("~/api/v2/services/checkout.service")
 const gateway = require("~/config/braintree.config")
-const { Order } = require("~/api/v1/models")
+const { Order } = require("~/api/v2/models");
+const { ORDER_STATUS, TRANSACTION } = require("../utils/constants");
 
 const createTransaction = async ({ userId, orderId, nonce }) => {
     const orderCheckout = await getOrder({ userId, orderId })
@@ -15,7 +16,7 @@ const createTransaction = async ({ userId, orderId, nonce }) => {
         })
     }
 
-    if (orderCheckout.orderStatus.name == "Pending") {
+    if (orderCheckout.orderStatus != ORDER_STATUS.PENDING) {
         throw new ApiError({
             status: StatusCodes.BAD_REQUEST,
             message: "Order can not be paid",
@@ -28,6 +29,9 @@ const createTransaction = async ({ userId, orderId, nonce }) => {
         phoneNumber,
         email,
         shipAddress,
+        postalCode,
+        region,
+        countryName,
         totalAmount,
     } = orderCheckout
 
@@ -48,24 +52,23 @@ const createTransaction = async ({ userId, orderId, nonce }) => {
             firstName: firstName,
             lastName: lastName,
             phoneNumber: phoneNumber,
-            postalCode: "70000",
-            region: "VN",
-            countryName: "Vietnam",
+            postalCode: postalCode || TRANSACTION.POSTAL_CODE_DEFAULT,
+            region: region || TRANSACTION.REGION_DEFAULT,
+            countryName: countryName || TRANSACTION.COUNTRY_DEFAULT,
             streetAddress: shipAddress,
         },
         shipping: {
-            countryName: "Vietnam",
+            countryName: countryName || TRANSACTION.COUNTRY_DEFAULT,
             firstName: firstName,
             lastName: lastName,
             phoneNumber: phoneNumber,
-            postalCode: "70000",
-            region: "VN",
+            postalCode: postalCode || TRANSACTION.POSTAL_CODE_DEFAULT,
+            region: region || TRANSACTION.REGION_DEFAULT,
             streetAddress: shipAddress,
         },
     })
 
     if (success) {
-        // update order status
         const foundOrder = await Order.findOne({
             where: { id: orderId },
         })
