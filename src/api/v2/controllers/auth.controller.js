@@ -16,7 +16,7 @@ const signUp = asyncHandling(async (req, res) => {
         genderId = 1,
         lastName,
         firstName,
-        phoneNumber = "",
+        phoneNumber,
         email,
         address = "",
         username,
