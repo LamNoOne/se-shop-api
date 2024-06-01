@@ -13,12 +13,12 @@ const { getToken } = require("../utils/auth.util")
 
 const signUp = asyncHandling(async (req, res) => {
     const {
-        genderId,
+        genderId = 1,
         lastName,
         firstName,
-        phoneNumber,
+        phoneNumber = "",
         email,
-        address,
+        address = "",
         username,
         password,
     } = req.body
