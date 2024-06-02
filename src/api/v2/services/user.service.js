@@ -11,6 +11,60 @@ const tokenService = require("~/api/v2/services/token.service")
 const refreshTokenUsedService = require("~/api/v2/services/refresh.token.used.sevice")
 const ApiError = require("~/core/api.error")
 
+const createUserOauth = async ({
+    oauthId,
+    roleId,
+    userStatusId,
+    genderId,
+    lastName,
+    firstName,
+    imageUrl,
+    phoneNumber,
+    email,
+    address,
+    username,
+    password,
+}) => {
+    const foundUser = await userRepo.getUser({
+        where: {
+            [Op.or]: [{ username }, { email }],
+        },
+    })
+
+    if (foundUser) {
+        let isExist = foundUser.username === username
+        if (isExist)
+            throw new ApiError(
+                StatusCodes.BAD_REQUEST,
+                "Username already exists"
+            )
+
+        isExist = foundUser.email === email
+        if (isExist)
+            throw new ApiError(StatusCodes.BAD_REQUEST, "Email has been used")
+        return
+    }
+
+    try {
+        return await userRepo.createUserWithOauth({
+            oauthId,
+            roleId,
+            userStatusId,
+            genderId,
+            lastName,
+            firstName,
+            imageUrl,
+            phoneNumber,
+            email,
+            address,
+            username,
+            password,
+        })
+    } catch (error) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Create user failed")
+    }
+}
+
 const createUser = async ({
     roleId,
     userStatusId,
@@ -222,4 +276,5 @@ module.exports = {
     updateStatus,
     deleteUserById,
     deleteUsersbyIds,
+    createUserOauth
 }

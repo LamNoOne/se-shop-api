@@ -10,6 +10,45 @@ const {
 const ApiError = require("~/core/api.error")
 const { REQUEST_HEADER_KEYS } = require("~/config/constants.config")
 const { getToken } = require("../utils/auth.util")
+const { v4: uuidv4 } = require("uuid");
+
+const oauth = asyncHandling(async (req, res) => {
+    const {
+        oauthId,
+        genderId = 1,
+        lastName,
+        firstName,
+        imageUrl = null,
+        email,
+        phoneNumber = null,
+        address = null,
+        username,
+        password = uuidv4()
+    } = req.body
+
+    const auth = await authService.oauth({
+        oauthId,
+        genderId,
+        lastName,
+        firstName,
+        phoneNumber,
+        imageUrl,
+        email,
+        address,
+        username,
+        password,
+    })
+
+    new SuccessResponse({
+        statusCode: StatusCodes.CREATED,
+        message: "Login with Oauth successfully",
+        metadata: {
+            user: auth.user,
+            accessToken: auth.accessToken,
+            refreshToken: auth.refreshToken,
+        }
+    }).send(res)
+})
 
 const signUp = asyncHandling(async (req, res) => {
     const {
@@ -18,7 +57,7 @@ const signUp = asyncHandling(async (req, res) => {
         firstName,
         phoneNumber,
         email,
-        address = "",
+        address = null,
         username,
         password,
     } = req.body
@@ -144,4 +183,5 @@ module.exports = {
     signOut,
     forgotPassword,
     resetPassword,
+    oauth
 }

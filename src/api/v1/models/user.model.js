@@ -15,6 +15,9 @@ User.init({
   genderId: {
     type: DataTypes.TINYINT.UNSIGNED
   },
+  oauthId: {
+    type: DataTypes.STRING
+  },
   lastName: {
     type: DataTypes.STRING
   },

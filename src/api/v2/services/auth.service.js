@@ -23,6 +23,107 @@ const {
     createResetToken,
 } = require("~/api/v2/utils/auth.util")
 
+const oauth = async ({
+    oauthId,
+    genderId,
+    lastName,
+    firstName,
+    imageUrl,
+    phoneNumber,
+    email,
+    address,
+    username,
+    password,
+}) => {
+    const user = await userRepo.getUserByOauthId(oauthId)
+    if (user) {
+        const { accessToken, refreshToken } = createTokenPair({
+            payload: { userId: user.id, username: user.username },
+            privateKey: user.privateKey,
+        })
+        const token = await tokenService.createToken({
+            accessToken,
+            refreshToken,
+            userId: user.id,
+        })
+
+        return {
+            user: {
+                id: user.id,
+                lastName: user.lastName,
+                firstName: user.firstName,
+                username: user.username,
+                image: user.imageUrl,
+                phoneNumber: user.phoneNumber,
+                email: user.email,
+                address: user.address,
+            },
+            accessToken: token.accessToken,
+            refreshToken: token.refreshToken,
+        }
+    }
+
+    try {
+        const customerRole = await roleRepo.getRoleByName("customer")
+        if (!customerRole)
+            throw new ApiError(
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                ReasonPhrases.INTERNAL_SERVER_ERROR
+            )
+        const activeStatus = await userStatusRepo.getUserStatusByName("active")
+        if (!activeStatus)
+            throw new ApiError(
+                StatusCodes.INTERNAL_SERVER_ERROR,
+                ReasonPhrases.INTERNAL_SERVER_ERROR
+            )
+
+        const newUser = await userService.createUserOauth({
+            oauthId,
+            roleId: customerRole.id,
+            genderId: genderId,
+            userStatusId: activeStatus.id,
+            lastName,
+            firstName,
+            imageUrl,
+            phoneNumber,
+            email,
+            address,
+            username,
+            password,
+        })
+        await cartService.createCart({ userId: newUser.id })
+        await wishListService.createWishList(newUser.id)
+
+        const { accessToken, refreshToken } = createTokenPair({
+            payload: { userId: newUser.id, username: newUser.username },
+            privateKey: newUser.privateKey,
+        })
+
+        const token = await tokenService.createToken({
+            accessToken,
+            refreshToken,
+            userId: newUser.id,
+        })
+
+        return {
+            user: {
+                id: newUser.id,
+                lastName: newUser.lastName,
+                firstName: newUser.firstName,
+                username: newUser.username,
+                image: newUser.imageUrl,
+                phoneNumber: newUser.phoneNumber,
+                email: newUser.email,
+                address: newUser.address,
+            },
+            accessToken: token.accessToken,
+            refreshToken: token.refreshToken,
+        }
+    } catch (error) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Login with Oauth failed")
+    }
+}
+
 const signUp = async ({
     genderId,
     lastName,
@@ -342,4 +443,5 @@ module.exports = {
     signOut,
     forgotPassword,
     resetPassword,
+    oauth,
 }

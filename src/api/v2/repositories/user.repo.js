@@ -23,6 +23,50 @@ const getUserById = async (id = "") => {
     })
 }
 
+const getUserByOauthId = async (oauthId = "") => {
+    return await User.findOne({
+        where: { oauthId: oauthId },
+    })
+}
+
+const createUserWithOauth = async ({
+    oauthId,
+    roleId,
+    userStatusId,
+    genderId,
+    lastName,
+    firstName,
+    imageUrl,
+    phoneNumber,
+    email,
+    address,
+    username,
+    password,
+}) => {
+    const { publicKey, privateKey } = createKeyPairRsa()
+    const passwordHash = await bcrypt.hash(password, saltRounds)
+    const user = (
+        await User.create({
+            oauthId,
+            roleId,
+            userStatusId,
+            genderId,
+            lastName,
+            firstName,
+            imageUrl,
+            phoneNumber,
+            email,
+            address,
+            username,
+            password: passwordHash,
+            publicKey,
+            privateKey,
+        })
+    ).dataValues
+    delete user.password
+    return user
+}
+
 const createUser = async ({
     roleId,
     userStatusId,
@@ -66,4 +110,6 @@ module.exports = {
     getUserById,
     getUserByUsername,
     createUser,
+    getUserByOauthId,
+    createUserWithOauth
 }

@@ -36,6 +36,10 @@ module.exports = {
                         key: "id",
                     },
                 },
+                oauthId: {
+                    type: Sequelize.STRING(255),
+                    allowNull: true
+                  },
                 lastName: {
                     type: Sequelize.STRING(50),
                     allowNull: false,

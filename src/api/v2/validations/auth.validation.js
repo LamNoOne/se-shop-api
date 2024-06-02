@@ -5,25 +5,74 @@ const { StatusCodes } = require("http-status-codes")
 const ApiError = require("~/core/api.error")
 const asyncHandling = require("~/core/async.handling")
 
-const validateSignUp = asyncHandling(async (req, res, next) => {
+const validateOauth = asyncHandling(async (req, res, next) => {
     const {
-        genderId = 1,
+        oauthId,
+        genderId,
         lastName,
         firstName,
-        phoneNumber,
+        imageUrl,
         email,
-        address = "",
+        phoneNumber,
+        address,
         username,
         password,
     } = req.body
 
     const userSchema = Joi.object({
-        genderId: Joi.number(),
+        oauthId: Joi.string().required(),
+        genderId: Joi.number().allow(null),
+        lastName: Joi.string().required().max(50),
+        firstName: Joi.string().required().max(30),
+        imageUrl: Joi.string().allow(null),
+        phoneNumber: Joi.string().min(10).max(11).allow(null),
+        email: Joi.string().required().max(50),
+        address: Joi.string().max(100).allow(null),
+        username: Joi.string().required().min(6).max(40),
+        password: Joi.string().min(6).max(40).allow(null),
+    })
+
+    try {
+        await userSchema.validateAsync(
+            {
+                oauthId,
+                genderId,
+                lastName,
+                firstName,
+                imageUrl,
+                email,
+                phoneNumber,
+                address,
+                username,
+                password,
+            },
+            { abortEarly: false }
+        )
+        next()
+    } catch (error) {
+        throw new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message)
+    }
+})
+
+const validateSignUp = asyncHandling(async (req, res, next) => {
+    const {
+        genderId,
+        lastName,
+        firstName,
+        phoneNumber,
+        email,
+        address,
+        username,
+        password,
+    } = req.body
+
+    const userSchema = Joi.object({
+        genderId: Joi.number().allow(null),
         lastName: Joi.string().required().max(50),
         firstName: Joi.string().required().max(30),
         phoneNumber: Joi.string().required().min(10).max(11),
         email: Joi.string().max(50),
-        address: Joi.string().max(100).allow(null, ""),
+        address: Joi.string().max(100).allow(null),
         username: Joi.string().required().min(6).max(40),
         password: Joi.string().required().min(6).max(40),
     })
@@ -106,4 +155,5 @@ module.exports = {
     validateSignIn,
     validateForgotPassword,
     validateResetPassword,
+    validateOauth,
 }

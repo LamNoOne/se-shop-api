@@ -6,6 +6,7 @@ const {
     validateSignIn,
     validateForgotPassword,
     validateResetPassword,
+    validateOauth
 } = require("~/api/v2/validations/auth.validation")
 const {
     signUp,
@@ -15,10 +16,12 @@ const {
     signOut,
     forgotPassword,
     resetPassword,
+    oauth,
 } = require("~/api/v2/controllers/auth.controller")
 
 const router = express.Router()
 
+router.post("/sign-in/oauth", validateOauth, oauth)
 router.get("/refresh-token", refreshToken)
 router.post("/sign-up", validateSignUp, signUp)
 router.post("/sign-up-admin", validateSignUp, signUpAdmin)
