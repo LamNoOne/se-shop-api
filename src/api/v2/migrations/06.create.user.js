@@ -37,7 +37,7 @@ module.exports = {
                     },
                 },
                 oauthId: {
-                    type: Sequelize.STRING(255),
+                    type: Sequelize.STRING(50),
                     allowNull: true
                   },
                 lastName: {
