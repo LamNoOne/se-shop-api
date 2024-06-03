@@ -1,5 +1,5 @@
 "use strict"
-
+require("dotenv").config()
 const bcrypt = require("bcrypt")
 const {
     app: { saltRounds, protocol, host, port, secretKeyAdmin },
@@ -22,20 +22,20 @@ const {
     verifyToken,
     createResetToken,
 } = require("~/api/v2/utils/auth.util")
+const { v4: uuidv4 } = require("uuid");
 
-const oauth = async ({
-    oauthId,
-    genderId,
-    lastName,
-    firstName,
-    imageUrl,
-    phoneNumber,
-    email,
-    address,
-    username,
-    password,
-}) => {
-    const user = await userRepo.getUserByOauthId(oauthId)
+const oauth = async (oauthTokenId) => {
+    // 1. Fetch to google api to get user information
+    const oauthCredentials = await getOauthCredentials(oauthTokenId)
+    const { sub, email, email_verified, given_name, family_name, picture } =
+        oauthCredentials
+    // 2. Check email is verified
+    if (!email_verified) {
+        throw new ApiError(StatusCodes.BAD_REQUEST, "Email is not verified")
+    }
+    // 3. Check if subId is exist in database
+    const user = await userRepo.getUserByOauthId(sub)
+    // 4. If subId is exist, return user and token pair
     if (user) {
         const { accessToken, refreshToken } = createTokenPair({
             payload: { userId: user.id, username: user.username },
@@ -63,6 +63,8 @@ const oauth = async ({
         }
     }
 
+    // 5. If subId is not exist, create new user and return user and token pair
+
     try {
         const customerRole = await roleRepo.getRoleByName("customer")
         if (!customerRole)
@@ -78,18 +80,18 @@ const oauth = async ({
             )
 
         const newUser = await userService.createUserOauth({
-            oauthId,
+            oauthId: sub,
             roleId: customerRole.id,
-            genderId: genderId,
+            genderId: 1,
             userStatusId: activeStatus.id,
-            lastName,
-            firstName,
-            imageUrl,
-            phoneNumber,
-            email,
-            address,
-            username,
-            password,
+            lastName: family_name,
+            firstName: given_name,
+            imageUrl: picture,
+            phoneNumber: null,
+            email: email,
+            address: null,
+            username: email,
+            password: uuidv4(),
         })
         await cartService.createCart({ userId: newUser.id })
         await wishListService.createWishList(newUser.id)
@@ -121,6 +123,29 @@ const oauth = async ({
         }
     } catch (error) {
         throw new ApiError(StatusCodes.BAD_REQUEST, "Login with Oauth failed")
+    }
+}
+
+const getOauthCredentials = async (oauthTokenId) => {
+    try {
+        const response = await fetch(
+            `${process.env.GOOGLE_API_TOKEN_ID}?id_token=${oauthTokenId}`,
+            {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        )
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`)
+        }
+
+        return await response.json()
+    } catch (error) {
+        console.error("Error:", error)
+        throw error
     }
 }
 
