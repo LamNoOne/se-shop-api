@@ -50,12 +50,12 @@ const signIn = asyncHandling(async (req, res) => {
   const result = await authService.signIn({ username, password })
 
   res.cookie('accessToken', result.accessToken, {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     sameSite:'None',
     maxAge: cookieATMaxAge
   }).cookie('refreshToken', result.refreshToken, {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     sameSite:'None',
     maxAge: cookieRTMaxAge
@@ -75,11 +75,11 @@ const refreshToken = asyncHandling(async (req, res) => {
   const tokenPair = await authService.refreshToken({ userId, refreshToken })
 
   res.cookie('accessToken', tokenPair.accessToken, {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     maxAge: cookieATMaxAge
   }).cookie('refreshToken', tokenPair.refreshToken, {
-    httpOnly: true,
+    httpOnly: false,
     secure: true,
     maxAge: cookieRTMaxAge
   })
